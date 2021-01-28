@@ -1,0 +1,13 @@
+{"nodes":[{"nodeID":"12","text":"Person X has connections to a militant entity","type":"I","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"13","text":"Person X has access to weapons","type":"I","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"14","text":"If someone has connections to a militant entity and has access to weapons, then he/she is a militant","type":"I","timestamp":"2021-01-25 13:27:05"}, 
+          {"nodeID":"15","text":"Person X is a militant","type":"I","timestamp":"2021-01-25 13:27:05"},
+         
+          {"nodeID":"16","text":"Default Inference","type":"RA","timestamp":"2021-01-26 09:23:34","scheme":"Default Inference","schemeID":"72"}],
+
+ "edges":[{"edgeID":"ee19","fromID":"12","toID":"16","formEdgeID":null},
+          {"edgeID":"ee20","fromID":"13","toID":"16","formEdgeID":null},
+          {"edgeID":"ee21","fromID":"14","toID":"16","formEdgeID":null},
+          {"edgeID":"ee22","fromID":"16","toID":"15","formEdgeID":null}],
+ 
+ "locutions":[]}

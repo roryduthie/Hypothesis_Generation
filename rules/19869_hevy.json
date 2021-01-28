@@ -1,0 +1,21 @@
+{"nodes":[{"nodeID":"28","text":"Person X is a member of a charity","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"29","text":"Person X flies regularly to a place Y","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"30","text":"Person X has phone conversations with people in place Y","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          
+          {"nodeID":"31","text":"Person X is not a foreign fighter","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"32","text":"Person X is not taking a known foreign fighter route","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+    
+          
+          {"nodeID": "E28", "type": "Event", "name": "belongs to charity", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""},
+          {"nodeID": "E29", "type": "Event", "name": "flying", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""},
+          {"nodeID": "E30", "type": "Event", "name": "phone conversation", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "FF place", "illustrate": ""}, 
+          {"nodeID": "E31", "type": "Event", "name": "not being foreign fighter", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""}, 
+          {"nodeID": "E32", "type": "Event", "name": "no foreign fighter route", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""}, 
+         ],
+
+ "edges":[{"edgeID":"ee59","fromID":"28","toID":"E28","formEdgeID":null,"text": "describes"},
+          {"edgeID":"ee60","fromID":"29","toID":"E29","formEdgeID":null,"text": "describes"},{"edgeID":"ee61","fromID":"30","toID":"E30","formEdgeID":null,"text": "describes"},
+          {"edgeID":"ee62","fromID":"31","toID":"E31","formEdgeID":null,"text": "describes"},
+          {"edgeID":"ee63","fromID":"32","toID":"E32","formEdgeID":null,"text": "describes"}]
+ 
+ "locutions":[]}
