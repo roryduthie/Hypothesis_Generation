@@ -3,6 +3,9 @@ import json
 import statistics
 from centrality import Centrality
 from glob import glob
+import spacy
+from SentenceSimilarity import SentenceSimilarity
+from itertools import combinations
 
 import os.path
 
@@ -223,7 +226,385 @@ def get_rules_data(rules_path, hevy_rules_path):
     full_scheme_data = [x for x in data if x]
     return rules, full_scheme_data
     
+def get_entity_from_text(nlp, text):
+    text = text.lower()
+    doc = nlp(text)
+    person_list=[]
+    org_list = []
+    place_list = []
+    for ent in doc.ents:
+        if ent.label_ == 'PERSON':
+            person_list.append(ent.text)
+        if ent.label_ == 'ORG':
+            org_list.append(ent.text)
+        if ent.label_ == 'GPE':
+            place_list.append(ent.text)
+    for token in doc:
+        if token.pos_ == 'PROPN' and not any(token.text in s for s in person_list) and not any(token.text in s for s in org_list) and any(token.text in s for s in place_list):
+            person_list.append(token.text)
+    return person_list, org_list
+    
+    
+def get_scheme_cq_hypothesis(scheme_type, text,node_id, agent, match, matching_proposition):
+    
+    scheme_hyps = []
+    
+    if scheme_type == "CauseToEffect":
+        scheme_hyps.append("There is no other cause for effect " + text, text, node_id, scheme_type)
+    if scheme_type == "PracticalReasoning":
+        scheme_hyps.append((agent + " has the means to carry out the action", text ,node_id, scheme_type))
+        scheme_hyps.append((agent + " does not have other conflicting goals", text ,node_id, scheme_type))
+    
+    if scheme_type == "VerbalClassification":
+        scheme_hyps.append(("There is doubt that " + agent + " has property " + text, text ,node_id, scheme_type))
+    if scheme_type == "ExpertOpinion":
+        scheme_hyps.append((agent + " is a credible expert", text ,node_id, scheme_type))
+        scheme_hyps.append((agent + " is an expert in the field", text ,node_id, scheme_type))
+        scheme_hyps.append((agent + " is a trusted source of information", text ,node_id, scheme_type))
+        scheme_hyps.append((agent + " provides consistent information", text ,node_id, scheme_type))
+        scheme_hyps.append((agent + " has provided proof", text ,node_id, scheme_type))
+    if scheme_type == "PositionToKnow":
+        scheme_hyps.append((agent + " provides consistent information", text ,node_id, scheme_type))
+        scheme_hyps.append((agent + " is in a position to know the truth", text ,node_id, scheme_type))
+        scheme_hyps.append((agent + " is a trusted source of information", text ,node_id, scheme_type))
+        scheme_hyps.append((agent + " has provided proof", text ,node_id, scheme_type))
+        
+        
+    if scheme_type == "PositiveConsequences":
+        scheme_hyps.append(("There is a high chance that " + text + ' will occur', text ,node_id, scheme_type))
+        scheme_hyps.append(("There are not other releveant consequences of " + text, text ,node_id, scheme_type))
+    return scheme_hyps
+    
+def get_argument_scheme_hypotheses(nlp, threshold, full_scheme_data, target_schemes):
+    hyps = []
+    new_hyps = []
+    for scheme_tup in target_schemes:
+        
+        node_id = scheme_tup[0]
+        node_text = scheme_tup[1]
+        scheme_list = scheme_tup[2]
+        agent_list = []
+        org_list = []
+        speaker = ''
+        if 'said' in node_text.lower():
+            sep = 'said'
+            speaker = node_text.lower().split(sep, 1)[0]
+            stripped = node_text.lower().split(sep, 1)[1]
+            agent_list, org_list = get_entity_from_text(nlp, stripped)
+        else:
+            agent_list, org_list = get_entity_from_text(nlp, stripped)
 
+        
+        output_hyps = compare_schemes(full_scheme_data, scheme_list, hyps, speaker, node_text, node_id, threshold, agent_list)
+        new_hyps.extend(output_hyps)
+        
+    new_hyps = list(set(new_hyps))
+    return new_hyps
+    
+def compare_schemes(full_scheme_data, scheme_list, hyps, speaker, node_text, node_id, threshold, agent_list):
+    for scheme in scheme_list:
+            if len(full_scheme_data) > 0:
+                for full_scheme in full_scheme_data:
+                    ra_id = full_scheme[0]
+                    hypothesis = full_scheme[1]
+                    premise = full_scheme[2]
+                    full_scheme_list = full_scheme[3]
+                
+                    for s in full_scheme_list:
+                        if s == scheme:
+                            sim = get_alternate_wn_similarity(str(node_text), str(premise))
+                            if sim >= threshold:
+                                if len(agent_list) < 1:
+                                    hypothesis = hypothesis.replace('Person X', org_list[0])
+                                    hyps.append((hypothesis, node_text, node_id))
+                                else:
+                                    hypothesis = hypothesis.replace('Person X', agent_list[0])
+                                    hyps.append((hypothesis, node_text, node_id))
+            if speaker == '':
+                hyps.extend(get_scheme_cq_hypothesis(scheme, node_text,node_id, agent_list[0], False, ''))
+            else:
+                hyps.extend(get_scheme_cq_hypothesis(scheme, node_text,node_id, speaker, False, ''))
+    return hyps
+    
+def get_alternate_wn_similarity(sent1, sent2):
+    sent_sim = SentenceSimilarity()
+    similarity = sent_sim.symmetric_sentence_similarity(sent1, sent2)
+    return similarity
+    
+
+def get_prop_pairs(props, volume):
+    pairs = list(combinations(props,volume))
+    return pairs
+    
+def get_event_similarity(e1, e2):
+    
+    sim_list = []
+    
+    
+    e1_name = ''
+    e2_name = ''
+    e1_circa = ''
+    e2_circa = ''
+    
+    e1_inSpace = ''
+    e2_inSpace = ''
+    
+    e1_agent = ''
+    e2_agent = ''
+    
+    e1_involved = ''
+    e2_involved = ''
+    
+    e1_time = ''
+    e2_time = ''
+    
+    
+    e1_place = ''
+    e2_place = ''
+    
+    e1_ill = ''
+    e2_ill = ''
+    
+    
+    
+    try:
+        e1_name = e1['name']
+        e2_name = e2['name']
+    except:
+        pass
+    
+    try:
+        e1_circa = e1['circa']
+        e2_circa = e2['circa']
+    except:
+        pass
+    
+    try:
+        e1_inSpace = e1['inSpace']
+        e2_inSpace = e2['inSpace']
+    except:
+        pass
+    
+    try:
+        e1_agent = e1['involvedAgent']
+        e2_agent = e2['involvedAgent']
+    except:
+        pass
+    
+    try:
+    
+        e1_involved = e1['involved']
+        e2_involved = e2['involved']
+    except:
+        pass
+    
+    try:
+        e1_time = e1['atTime']
+        e2_time = e2['atTime']
+    except:
+        pass
+    
+    try:
+        e1_place = e1['atPlace']
+        e2_place = e2['atPlace']
+    except:
+        pass
+    
+    try:
+        e1_ill = e1['illustrate']
+        e2_ill = e2['illustrate']
+    except:
+        pass
+    
+    if e1_name == '' or e2_name == '':
+        pass
+    elif e1_name == e2_name:
+        sim_list.append(1)
+    else:
+        name_sim = get_alternate_wn_similarity(e1_name, e2_name)
+        sim_list.append(name_sim)
+    
+    if e1_circa == '' or e2_circa == '':
+        pass
+    elif e1_circa == e2_circa:
+        sim_list.append(1)
+    else:
+        circa_sim = get_alternate_wn_similarity(e1_circa, e2_circa)
+        sim_list.append(circa_sim)
+    
+    if e1_inSpace == '' or  e2_inSpace == '':
+        pass
+    
+    elif e1_inSpace == e2_inSpace:
+        sim_list.append(1)
+    else:
+        space_sim = get_alternate_wn_similarity(e1_inSpace, e2_inSpace)
+        sim_list.append(space_sim)
+        
+    if isinstance(e1_agent, str) and isinstance(e2_agent, str):
+        if e1_agent == '' or e2_agent == '':
+            pass
+        elif e1_agent == e2_agent:
+            sim_list.append(1)
+        else:
+            agent_sim = get_alternate_wn_similarity(e1_agent, e2_agent)
+            sim_list.append(agent_sim)
+    else:
+        e1_agent = ' '.join(e1_agent)
+        if e1_agent == '' or e2_agent == '':
+            pass
+        elif e1_agent == e2_agent:
+            sim_list.append(1)
+        else:
+            agent_sim = get_alternate_wn_similarity(e1_agent, e2_agent)
+            sim_list.append(agent_sim)
+        
+    if e1_involved == '' or e2_involved == '':
+        pass
+    elif e1_involved == e2_involved:
+        sim_list.append(1)
+    else:
+        inv_sim = get_alternate_wn_similarity(e1_involved, e2_involved)
+        sim_list.append(inv_sim)
+        
+    if e1_time == '' or e2_time == '':
+        pass
+    elif e1_time == e2_time:
+        sim_list.append(1)
+    else:
+        time_sim = get_alternate_wn_similarity(e1_time, e2_time)
+        sim_list.append(time_sim)
+        
+    if e1_place == '' or e2_place == '':
+        pass
+    elif e1_place == e2_place:
+        sim_list.append(1)
+    else:
+        place_sim = get_alternate_wn_similarity(e1_place, e2_place)
+        sim_list.append(place_sim)
+        
+    if e1_ill == '' or  e2_ill == '':
+        pass
+    elif e1_ill == e2_ill:
+        sim_list.append(1)
+    else:
+        ill_sim = get_alternate_wn_similarity(e1_ill, e2_ill)
+        sim_list.append(ill_sim)
+  
+
+    
+    harm_mean = statistics.mean(sim_list)
+    
+    return harm_mean
+    
+    
+def create_rule_hypothesis(score_store, rule_id, rule_hyp, prem_id, nlp):
+    
+    overall_hypothesis_list = []
+    
+    for score in score_store:
+                
+        matched_premise = score[0]
+        matched_rule_premise = score[1]
+        sim = score[2]
+        rule_type = score[3]
+        agent = ''
+        agent_list = []
+        org_list = []
+        overall_hyp = ''
+                
+                
+                
+        if rule_type == 'EVENT RULE':
+            ev_premise = score[4]
+            agent = ev_premise['involvedAgent']
+            if not isinstance(agent, str):
+                agent = agent[0]
+        else:
+                    
+            agent_list, org_list = get_entity_from_text(nlp, matched_premise)
+        if 'Person X' in rule_hyp and len(agent_list) > 0:
+            agent = agent_list[0]
+            overall_hyp = rule_hyp.replace('Person X', agent)
+            #overall_hypothesis_list.append(overall_hyp)
+        elif 'Person X' in rule_hyp:
+            overall_hyp = rule_hyp.replace('Person X', agent)
+            #overall_hypothesis_list.append(overall_hyp)
+                
+        overall_hypothesis_list.append([overall_hyp,rule_id, matched_premise, matched_rule_premise, sim, rule_type, prem_id])
+    return overall_hypothesis_list
+    
+    
+def compare_rules_to_props(target_nodes, rule_premises, rule_id, rule_hyp, nlp, hevy_jsn, threshold):
+    overall_hyp_list = []
+    for target in target_nodes:
+    
+        rule_flag = True
+        score_store = []
+        for prem in target:
+            l = [None] * len(target)
+            counter = 0
+            for r in rule_premises:
+                rule_text = r[1]
+                rule_event = r[2]
+                prem_id = prem[0]
+                prem_text = prem[1]
+                prem_event = ''
+                try:
+                    prem_event = get_hevy_event(prem_id, hevy_jsn)
+                except:
+                    pass
+                sim = 0
+                event_flag = False
+                if prem_event == '' or rule_event == '':
+                    sim = get_alternate_wn_similarity(prem[1], rule_text)
+                else:
+                    sim = get_event_similarity(prem_event, rule_event)
+                    event_flag = True
+                
+                if event_flag:
+                    if sim >= (threshold): #threshold * 2
+                        
+                        score_store.append((prem_text, rule_text, sim, 'EVENT RULE', prem_event))
+                    
+                        l[counter] = 1
+                    else:
+                        l[counter] = 0
+                    counter = counter + 1
+                else:
+                    if sim >= (threshold * 2):
+           
+                        score_store.append((prem_text, rule_text, sim, 'SIM RULE', ''))
+                       
+                        l[counter] = 1
+                    else:
+                        l[counter] = 0
+                    counter = counter + 1
+            if sum(l) < 1:
+                rule_flag = False
+                break
+    
+        if rule_flag:
+
+            hyps = create_rule_hypothesis(score_store, rule_id, rule_hyp, prem_id, nlp)
+            overall_hyp_list.extend(hyps)
+            
+    return overall_hyp_list
+    
+def get_hyps_from_rules(hevy_jsn, i_nodes, rules, threshold, nlp):
+    all_hypothesis_list = []
+    for rule in rules:
+        rule_id = rule[0]
+        rule_hyp = rule[1]
+        rule_premises = rule[2]
+        premise_volume = len(rule_premises)
+    
+    
+        target_nodes = get_prop_pairs(i_nodes, premise_volume)
+        
+        hypothesis_list = compare_rules_to_props(target_nodes, rule_premises, rule_id, rule_hyp, nlp, hevy_jsn, threshold)
+        all_hypothesis_list.extend(hypothesis_list)
+    return all_hypothesis_list
 
 if __name__ == "__main__":
     json_path = str(sys.argv[1])
@@ -235,5 +616,13 @@ if __name__ == "__main__":
     hevy_rules_path = 'rules/hevy/'
     
     rules, full_scheme_data = get_rules_data(rules_path, hevy_rules_path)
+    nlp = spacy.load("en_core_web_sm")
+
+    scheme_hypos = get_argument_scheme_hypotheses(nlp, 0.33, full_scheme_data, target_schemes)
     
-    print_path(json_path)
+    cent = Centrality()
+    i_nodes = cent.get_i_node_list(graph)
+    hevy_jsn = get_hevy_json('20088_targe', '')
+    rule_hypos = get_hyps_from_rules(hevy_jsn, i_nodes, rules, 0.17, nlp)
+    
+    print(rule_hypos)
