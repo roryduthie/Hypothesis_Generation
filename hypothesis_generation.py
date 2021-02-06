@@ -1044,7 +1044,7 @@ if __name__ == "__main__":
     
     cent = Centrality()
     i_nodes = cent.get_i_node_list(graph)
-    hevy_jsn = get_hevy_json('20088_targe', '')
+    hevy_jsn = get_hevy_json(hevy_file_name, '')
     rule_hypos = get_hyps_from_rules(hevy_jsn, i_nodes, rules, 0.17, nlp)
     rule_hypo_list = remove_duplicate_hypos(rule_hypos)
     
