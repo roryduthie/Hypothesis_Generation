@@ -994,6 +994,26 @@ def alternate_hyps_aif(alt_hyps):
         new_edge_list.append(Cedge_2)
         
     return new_node_list, new_edge_list
+    
+def print_hypoths(hyps, alt_hyps):
+    print('Generated the following hypotheses: ')
+    print(' ')
+    for hyp in hyps:
+        
+        
+        print(hyp[1])
+    print(' ')
+    print('Generated the alternative hypotheses: ')
+    print(' ')
+    for alt_hyp in alt_hyps:
+        
+        
+        print(alt_hyp[0])
+        
+def write_json_to_file(jsn, path):
+    
+    with open(path, 'w') as fp:
+        json.dump(jsn, fp)
 
 if __name__ == "__main__":
     json_path = str(sys.argv[1])
@@ -1051,4 +1071,7 @@ if __name__ == "__main__":
     alt_jsn_copy['edges'] = edges_cp
     
     
-    print('Done')
+    
+    
+    print_hypoths(hypoths_list, alternative_hypotheses)
+    write_json_to_file(alt_jsn_copy, 'generated_hyps.json')
