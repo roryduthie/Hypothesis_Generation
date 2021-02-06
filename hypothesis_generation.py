@@ -6,6 +6,9 @@ from glob import glob
 import spacy
 from SentenceSimilarity import SentenceSimilarity
 from itertools import combinations
+import datetime
+import copy
+import re
 
 import os.path
 
@@ -30,6 +33,13 @@ def get_graph_json(json_path):
     graph = cent.get_graph_string(json_data)
     
     return graph, json_data
+    
+def get_graph(jsn):
+    cent = Centrality()
+    
+    graph = cent.get_graph_string(jsn)
+    
+    return graph
     
 def get_arg_schemes_props(graph, json_data):
     cent = Centrality()
@@ -316,10 +326,10 @@ def compare_schemes(full_scheme_data, scheme_list, hyps, speaker, node_text, nod
                             if sim >= threshold:
                                 if len(agent_list) < 1:
                                     hypothesis = hypothesis.replace('Person X', org_list[0])
-                                    hyps.append((hypothesis, node_text, node_id))
+                                    hyps.append((hypothesis, node_text, node_id, scheme))
                                 else:
                                     hypothesis = hypothesis.replace('Person X', agent_list[0])
-                                    hyps.append((hypothesis, node_text, node_id))
+                                    hyps.append((hypothesis, node_text, node_id, scheme))
             if speaker == '':
                 hyps.extend(get_scheme_cq_hypothesis(scheme, node_text,node_id, agent_list[0], False, ''))
             else:
@@ -531,7 +541,7 @@ def create_rule_hypothesis(score_store, rule_id, rule_hyp, prem_id, nlp):
             overall_hyp = rule_hyp.replace('Person X', agent)
             #overall_hypothesis_list.append(overall_hyp)
                 
-        overall_hypothesis_list.append([overall_hyp,rule_id, matched_premise, matched_rule_premise, sim, rule_type, prem_id])
+        overall_hypothesis_list.append([overall_hyp,rule_id, matched_premise, matched_rule_premise, sim, rule_type, prem_id, 'Default Inference'])
     return overall_hypothesis_list
     
     
@@ -605,6 +615,385 @@ def get_hyps_from_rules(hevy_jsn, i_nodes, rules, threshold, nlp):
         hypothesis_list = compare_rules_to_props(target_nodes, rule_premises, rule_id, rule_hyp, nlp, hevy_jsn, threshold)
         all_hypothesis_list.extend(hypothesis_list)
     return all_hypothesis_list
+    
+def remove_duplicate_hypos(overall_hypothesis_list):
+    d = {}
+    for sub in overall_hypothesis_list:
+        hyp_name = sub[0]
+        hyp_id = sub[1]
+        prem = sub[2]
+        sim = sub[4]
+        hyp_name = hyp_name.lower()
+        key_string = str(hyp_name) + str(hyp_id) + str(prem)
+    
+        if key_string in d:
+            if sim > d[key_string][4]:
+                d[key_string] = sub
+        else:
+        
+            d[key_string] = sub
+    return list(d.values())
+    
+def combine_hypothesis_lists(arg_schemes_hyps, rules_hyps):
+    new_arg_scheme_list = []
+    for hyp in arg_schemes_hyps:
+        hypothesis = hyp[0].lower()
+        premise = hyp[1].lower()
+        premise_id = hyp[2]
+        scheme_type = hyp[3]
+        rule_flag = False
+        for i,hyp1 in enumerate(rules_hyps):
+            hypothesis1 = hyp1[0].lower()
+            rules_hyps[i][0] = hypothesis1
+            premise1 = hyp1[2].lower()
+            scheme_type1 = hyp1[7]
+            if hypothesis == hypothesis1 and premise == premise1:
+                rule_flag = True
+                rules_hyps[i][7] = scheme_type
+        
+        if not rule_flag:
+            new_arg_scheme_list.append([hypothesis, '', premise, '', 0, 'SCHEME RULE', premise_id, scheme_type])
+    
+    return new_arg_scheme_list, rules_hyps
+    
+def get_node_ID(graph_jsn, text):
+    for node in graph_jsn['nodes']:
+        n_text = node['text']
+        n_id = node['nodeID']
+        if text == n_text:
+            return n_id
+        
+    return ''
+    
+def create_hyp_ya(node_id):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ya_dict = {"nodeID":node_id,"text":"Hypothesising","type":"YA","timestamp":timestamp,"scheme":"Hypothesising","schemeID":"410"}
+    return ya_dict
+    
+def create_l_node(node_id, text):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    l_text = 'Hypothesis Generator : ' + text
+    l_dict = {"nodeID":node_id,"text":l_text,"type":"L","timestamp":timestamp}
+    return l_dict
+    
+def create_ra_node(node_id, text):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    ra_dict = {"nodeID":node_id,"text":text,"type":"RA","timestamp":timestamp}
+    return ra_dict
+    
+def create_edge(edge_id, fromID, toID):
+    edge_dict = {"edgeID":edge_id,"fromID":fromID,"toID":toID}
+    return edge_dict
+    
+def check_hyp_list(hyp, rule_list):
+    
+    
+    hypothesis = hyp[0]
+    rule_number = hyp[1]
+    premise = hyp[2]
+    rule_premise = hyp[3]
+    sim = hyp[4]
+    rule_type = hyp[5]
+    ra_type = hyp[7]
+    
+    hyp_check = True
+    rule_check = True
+    prem_check = True
+    
+    for rule in rule_list:
+        
+        
+        
+        r_hypothesis = rule[0]
+        r_rule_number = rule[1]
+        r_premise = rule[2]
+        r_rule_premise = rule[3]
+        r_sim = rule[4]
+        r_rule_type = rule[5]
+        r_ra_type = rule[7]
+        r_ra_id = rule[8]
+        
+            
+        
+        if hypothesis == r_hypothesis and rule_number == r_rule_number and premise == r_premise:
+            #Already a connected made so return all false
+            return False,'False'
+        
+        if hypothesis == r_hypothesis and rule_number == r_rule_number and premise != r_premise:
+            return True, r_ra_id
+        
+        if hypothesis != r_hypothesis:
+            hyp_check = False
+        
+        if hypothesis == r_hypothesis and rule_number != r_rule_number:
+            rule_check = False
+            
+    if not hyp_check:
+        return False, ''
+    
+    if not rule_check:
+        return False, ''
+    
+    return False,'False'
+    
+def change_ra_type(ra_id, node_list, ra_type):
+    for node in node_list:
+        if node['nodeID'] == ra_id:
+            curr_ra_text = node['text']
+            if curr_ra_text == 'Default Inference' and ra_type != 'Default Inference':
+                node['text'] = ra_type
+                
+
+def construct_aif_graph(hypotheses, jsn):
+    new_node_list = []
+    new_edge_list = []
+    rule_lst = []
+    
+    for i, hyp in enumerate(hypotheses):
+        hypothesis = hyp[0]
+        rule_number = hyp[1]
+        premise = hyp[2]
+        rule_premise = hyp[3]
+        sim = hyp[4]
+        rule_type = hyp[5]
+        p_id = hyp[6]
+        ra_type = hyp[7]
+        
+        #n_id = get_node_ID(jsn, hypothesis)
+        #n_id == '' and 
+        if not any(d['text'] == hypothesis for d in new_node_list):
+            #create node
+            n_id = "H" + str(i)
+            node_id = "H" + str(i)
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            node_dict = {"nodeID": node_id, "text": hypothesis, "type":"I", "timestamp":timestamp}
+            ya_id = "YA" + str(i)
+            ya_node = create_hyp_ya(ya_id)
+            l_id = "L" + str(i)
+            L_node = create_l_node(l_id, hypothesis)
+            edge1_id = 'E1H' + str(i)
+            edge_1 = create_edge(edge1_id, l_id, ya_id)
+            
+            edge2_id = 'E2H' + str(i)
+            edge_2 = create_edge(edge2_id, ya_id, node_id)
+            
+            new_node_list.append(node_dict)
+            new_node_list.append(ya_node)
+            new_node_list.append(L_node)
+            
+            new_edge_list.append(edge_1)
+            new_edge_list.append(edge_2)
+            
+        check_bool = False
+        id_str = ''
+            
+        #Here create RAS and edges from premises to the RAs
+        premise_id = get_node_ID(jsn, premise)
+        if len(rule_lst) > 0:
+            check_bool, id_str = check_hyp_list(hyp, rule_lst)
+        
+        if rule_number == '':
+            ra_id = 'RA' + str(i)
+            new_ra_node = create_ra_node(ra_id, ra_type)
+            
+            edge1_id = 'EH' + str(i)
+            edge_1 = create_edge(edge1_id, p_id, ra_id)
+            
+            edge2_id = 'EHT' + str(i)
+            edge_2 = create_edge(edge2_id, ra_id, n_id)
+
+            
+            new_node_list.append(new_ra_node)
+            new_edge_list.append(edge_1)
+            new_edge_list.append(edge_2)
+            
+        elif len(rule_lst) < 1: 
+            ra_id = 'RA' + str(i)
+            new_ra_node = create_ra_node(ra_id, ra_type)
+            
+            edge1_id = 'EH' + str(i)
+            edge_1 = create_edge(edge1_id, premise_id, ra_id)
+            
+            edge2_id = 'EHT' + str(i)
+            edge_2 = create_edge(edge2_id, ra_id, n_id)
+            
+            
+            hyp.append(ra_id)
+            rule_lst.append(hyp)
+            
+            new_node_list.append(new_ra_node)
+            new_edge_list.append(edge_1)
+            new_edge_list.append(edge_2)
+            
+        elif not check_bool and id_str == 'False':
+            pass
+        elif check_bool:
+            
+            #GET RA TO CHECK TYPE
+            change_ra_type(id_str,new_node_list, ra_type)
+            
+            edge1_id = 'EH' + str(i)
+            edge_1 = create_edge(edge1_id, premise_id, id_str)
+            
+            
+            hyp.append(id_str)
+            rule_lst.append(hyp)
+            new_edge_list.append(edge_1)
+        elif not check_bool and id_str == '':
+            ra_id = 'RA' + str(i)
+            new_ra_node = create_ra_node(ra_id, ra_type)
+            
+            edge1_id = 'EH' + str(i)
+            edge_1 = create_edge(edge1_id, premise_id, ra_id)
+            
+            edge2_id = 'EHT' + str(i)
+            edge_2 = create_edge(edge2_id, ra_id, n_id)
+            
+            hyp.append(ra_id)
+            rule_lst.append(hyp)
+            
+            new_node_list.append(new_ra_node)
+            new_edge_list.append(edge_1)
+            new_edge_list.append(edge_2)
+    
+    return new_node_list, new_edge_list
+    
+def get_hypotheses_list(jsn_data):
+    nodes = jsn_data['nodes']
+    edges = jsn_data['edges']
+    
+    hypothesis_list = []
+    
+    for node in nodes:
+        node_id = node['nodeID']
+        if node['text'] == 'Hypothesising':
+            for edge in edges:
+                if str(edge['fromID']) == str(node_id):
+                    hyp_id = edge['toID']
+                    for n in nodes:
+                        n_id = n['nodeID']
+                        n_text = n['text']
+                        if str(n_id) == hyp_id:
+                            hypothesis_list.append([hyp_id, n_text])
+    return hypothesis_list
+    
+def generate_alternative_hypothesis(hypotheses, nlp):
+    negative_hyps = []
+    for hyp in hypotheses:
+        h_id = hyp[0]
+        h_text = hyp[1]
+        doc = nlp(h_text)
+        negation = [tok for tok in doc if tok.dep_ == 'neg']
+        neg_flag = check_for_negation(negation)
+        if neg_flag:
+            pos_form = convert_to_positive_form(negation, h_text)
+            negative_hyps.append([pos_form, h_id, h_text])
+            
+        else:
+            neg_form = convert_to_negative_form(h_text, doc)
+            negative_hyps.append([neg_form, h_id, h_text])
+    return negative_hyps
+    
+def check_for_negation(negation_list):
+    if len(negation_list) < 1:
+        return False
+    else:
+        return True
+        
+def convert_to_positive_form(negation_list, sentence):
+    negation_list = [str(x).lower() for x in negation_list]
+    resultwords  = [word for word in re.split("\W+",sentence) if word.lower() not in negation_list]
+    result = ' '.join(resultwords)
+    return result
+    
+def convert_to_negative_form(sent, doc):
+    for token in doc:
+        if token.dep_ == 'ROOT' or token.dep_ == 'aux':
+            if 'VB' in token.tag_:
+                if token.tag_ == 'VBZ':
+                #insert Not after
+                    negation = 'not'
+                    word_list = [token.text]
+                    word_list = [str(x).lower() for x in word_list]
+                    sent_words = re.split("\W+",sent)
+                    resultwords  = [word.lower() + ' ' + negation + ' ' if word.lower() in word_list else word.lower() for word in sent_words ]
+                    result = ' '.join(resultwords)
+                    return result
+                else:
+                    negation = 'did not'
+                    word_list = [token.text]
+                    word_list = [str(x).lower() for x in word_list]
+                    sent_words = re.split("\W+",sent)
+                    resultwords  = [' ' + negation + ' ' + str(token.lemma_) if word.lower() in word_list else word.lower() for word in sent_words ]
+                    result = ' '.join(resultwords)
+                    return result
+    return 'not ' + sent.lower()
+    
+def create_ca_node(node_id, text):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    ca_dict = {"nodeID":node_id,"text":text,"type":"CA","timestamp":timestamp}
+    return ca_dict
+    
+def alternate_hyps_aif(alt_hyps):
+    new_node_list = []
+    new_edge_list = []
+    
+    for i, hyp in enumerate(alt_hyps):
+        alt_text = hyp[0]
+        hyp_id = hyp[1]
+        
+        n_id = "AH" + str(i)
+        node_id = "AH" + str(i)
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        node_dict = {"nodeID": node_id, "text": alt_text, "type":"I", "timestamp":timestamp}
+        ya_id = "AYA" + str(i)
+        ya_node = create_hyp_ya(ya_id)
+        
+        l_id = hyp_id.replace('H', 'L')
+            
+        edge1_id = 'EA' + str(i)
+        edge_1 = create_edge(edge1_id, l_id, ya_id)
+            
+        edge2_id = 'EA' + str(i)
+        edge_2 = create_edge(edge2_id, ya_id, node_id)
+        
+        ca_1_id = 'CA' + str(i)
+        ca_2_id = 'ACA' + str(i)
+        
+        ca_text = 'Default Conflict'
+        
+        ca_1_node = create_ca_node(ca_1_id, ca_text)
+        ca_2_node = create_ca_node(ca_2_id, ca_text)
+        
+        CAedge1_id = 'CAE' + str(i)
+        CAedge_1 = create_edge(CAedge1_id, hyp_id, ca_1_id)
+            
+        CAedge2_id = 'CAAE' + str(i)
+        CAedge_2 = create_edge(CAedge2_id, ca_1_id, node_id)
+        
+        
+        Cedge1_id = 'CE' + str(i)
+        Cedge_1 = create_edge(Cedge1_id, node_id, ca_2_id)
+            
+        Cedge2_id = 'CEE' + str(i)
+        Cedge_2 = create_edge(CAedge2_id, ca_2_id, hyp_id)
+            
+        new_node_list.append(node_dict)
+        new_node_list.append(ya_node)
+        new_node_list.append(ca_1_node)
+        new_node_list.append(ca_2_node)
+            
+        new_edge_list.append(edge_1)
+        new_edge_list.append(edge_2)
+        new_edge_list.append(CAedge_1)
+        new_edge_list.append(CAedge_2)
+        
+        new_edge_list.append(Cedge_1)
+        new_edge_list.append(Cedge_2)
+        
+    return new_node_list, new_edge_list
 
 if __name__ == "__main__":
     json_path = str(sys.argv[1])
@@ -624,5 +1013,42 @@ if __name__ == "__main__":
     i_nodes = cent.get_i_node_list(graph)
     hevy_jsn = get_hevy_json('20088_targe', '')
     rule_hypos = get_hyps_from_rules(hevy_jsn, i_nodes, rules, 0.17, nlp)
+    rule_hypo_list = remove_duplicate_hypos(rule_hypos)
     
-    print(rule_hypos)
+    scheme_list, overall_rule_list = combine_hypothesis_lists(scheme_hypos, rule_hypo_list)
+    
+    all_hypotheses = scheme_list + overall_rule_list
+    
+    all_hypotheses_copy = copy.deepcopy(all_hypotheses)
+    
+    nodelst, edgelst = construct_aif_graph(all_hypotheses_copy, jsn)
+    
+    jsn_copy = copy.deepcopy(jsn)
+    
+    nodes_cp = jsn_copy['nodes']
+    nodes_cp.extend(nodelst)
+    jsn_copy['nodes'] = nodes_cp
+    
+    edges_cp = jsn_copy['edges']
+    edges_cp.extend(edgelst)
+    jsn_copy['edges'] = edges_cp
+
+    
+    hypoths_list = get_hypotheses_list(jsn_copy)
+    
+    alternative_hypotheses = generate_alternative_hypothesis(hypoths_list, nlp)
+    
+    alt_nodes, alt_edges = alternate_hyps_aif(alternative_hypotheses)
+    
+    alt_jsn_copy = copy.deepcopy(jsn_copy)
+    
+    nodes_cp = alt_jsn_copy['nodes']
+    nodes_cp.extend(alt_nodes)
+    alt_jsn_copy['nodes'] = nodes_cp
+    
+    edges_cp = alt_jsn_copy['edges']
+    edges_cp.extend(alt_edges)
+    alt_jsn_copy['edges'] = edges_cp
+    
+    
+    print('Done')

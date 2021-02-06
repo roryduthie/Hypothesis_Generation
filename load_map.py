@@ -13,8 +13,8 @@ class CorpusLoader:
         try:
             cast_timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
         except (ValueError, TypeError):
-            print('Failed datetime(timestamp) casting:')
-            print(timestamp)
+            #print('Failed datetime(timestamp) casting:')
+            #print(timestamp)
             cast_timestamp = timestamp
         return cast_timestamp
 
@@ -23,8 +23,8 @@ class CorpusLoader:
         try:
             cast_scheme_id = int(scheme_id)
         except (ValueError, TypeError):
-            print('Failed int(schemeID) casting:')
-            print(scheme_id)
+            #print('Failed int(schemeID) casting:')
+            #print(scheme_id)
             cast_scheme_id = scheme_id
         return cast_scheme_id
 
@@ -33,8 +33,8 @@ class CorpusLoader:
         try:
             cast_node_id = int(node_id)
         except (ValueError, TypeError):
-            print('Failed int(nodeID) casting:')
-            print(node_id)
+            #print('Failed int(nodeID) casting:')
+            #print(node_id)
             cast_node_id = node_id
         return cast_node_id
 
@@ -43,8 +43,8 @@ class CorpusLoader:
         try:
             case_edge_id = int(edge_id)
         except (ValueError, TypeError):
-            print('Failed int(edgeID) casting:')
-            print(edge_id)
+            #print('Failed int(edgeID) casting:')
+            #print(edge_id)
             case_edge_id = edge_id
         return case_edge_id
 

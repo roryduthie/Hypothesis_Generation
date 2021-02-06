@@ -401,3 +401,19 @@ class Centrality:
                 ca_tup = (ca, i_2_text)
                 ca_tups.append(ca_tup)
         return ca_tups
+        
+    @staticmethod
+    def get_hyp_i_nodes(graph, new_i_nodes):
+        hyp_nodes = []
+        for i_node in new_i_nodes:
+            ID = i_node[0]
+            text = i_node[1]
+            node_preds = list(graph.predecessors(ID))
+
+            for node in node_preds:
+                node_type = graph.nodes[node]['type']
+                node_text = graph.nodes[node]['text']
+
+                if node_text == 'Hypothesising':
+                    hyp_nodes.append(i_node)
+        return hyp_nodes
