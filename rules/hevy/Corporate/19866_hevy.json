@@ -1,0 +1,16 @@
+{"nodes":[{"nodeID":"7","text":"Person X has issues with his/her colleagues","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"8","text":"Person X stays longer in his/her office","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"9","text":"Person X's managers are informed that he had a job interview at a competitor company","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+   
+          {"nodeID":"5","text":"Person X is committing corporate espionage","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+    
+          {"nodeID": "E7", "type": "Event", "name": "issues with colleagues", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""},
+          {"nodeID": "E8", "type": "Event", "name": "staying longer in office", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""},
+          {"nodeID": "E9", "type": "Event", "name": "interview at competitors", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""}, 
+          {"nodeID": "E5", "type": "Event", "name": "corporate espionage", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""}
+         ],
+
+ "edges":[{"edgeID":"ee15","fromID":"7","toID":"E7","formEdgeID":null,"text": "describes"},
+          {"edgeID":"ee16","fromID":"8","toID":"E8","formEdgeID":null,"text": "describes"},{"edgeID":"ee17","fromID":"9","toID":"E9","formEdgeID":null,"text": "describes"},{"edgeID":"ee18","fromID":"5","toID":"E5","formEdgeID":null,"text": "describes"}],
+ 
+ "locutions":[]}

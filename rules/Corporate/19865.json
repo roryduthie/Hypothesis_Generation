@@ -1,0 +1,13 @@
+{"nodes":[{"nodeID":"1","text":"Person X buys a new house","type":"I","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"2","text":"Person X has connections to a competitor company","type":"I","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"3","text":"Person X has access to his/her company's new products","type":"I","timestamp":"2021-01-25 13:27:05"}, 
+          {"nodeID":"5","text":"Person X is committing corporate espionage","type":"I","timestamp":"2021-01-25 13:27:05"},
+         
+          {"nodeID":"6","text":"Default Inference","type":"RA","timestamp":"2021-01-26 09:23:34","scheme":"Default Inference","schemeID":"72"}],
+
+ "edges":[{"edgeID":"ee1","fromID":"1","toID":"6","formEdgeID":null},
+          {"edgeID":"ee2","fromID":"2","toID":"6","formEdgeID":null},
+          {"edgeID":"ee3","fromID":"3","toID":"6","formEdgeID":null},
+          {"edgeID":"ee5","fromID":"6","toID":"5","formEdgeID":null}],
+ 
+ "locutions":[]}

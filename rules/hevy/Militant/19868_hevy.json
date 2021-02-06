@@ -2,8 +2,8 @@
           {"nodeID":"18","text":"Person X is on police watchlist","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
           {"nodeID":"19","text":"Person X flies to a foreigh fighter place from a foreign fighter point","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
           
-          {"nodeID":"20","text":"Person X is a foreign fighter","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
-          {"nodeID":"21","text":"Person X is taking a known foreign fighter route","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"20","text":"Person X is a militant","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"21","text":"Person X is taking a known militant route","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
     
           
           {"nodeID": "E17", "type": "Event", "name": "visit", "circa": "", "inSpace": "FF location", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""},

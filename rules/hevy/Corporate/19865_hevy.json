@@ -1,0 +1,17 @@
+{"nodes":[{"nodeID":"1","text":"Person X buys a new house","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"2","text":"Person X has connections to a competitor company","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"3","text":"Person X has access to his/her company's new products","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"5","text":"Person X is committing corporate espionage","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+    
+         
+          {"nodeID": "E1", "type": "Event", "name": "new house buy", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""},
+          {"nodeID": "E2", "type": "Event", "name": "connections to entity", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""},
+          {"nodeID": "E3", "type": "Event", "name": "access to stuff", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""}, 
+          {"nodeID": "E5", "type": "Event", "name": "corporate espionage", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""}
+         
+         ],
+
+ "edges":[{"edgeID":"ee6","fromID":"1","toID":"E1","formEdgeID":null,"text": "describes"},
+          {"edgeID":"ee7","fromID":"2","toID":"E2","formEdgeID":null,"text": "describes"},{"edgeID":"ee8","fromID":"3","toID":"E3","formEdgeID":null,"text": "describes"},{"edgeID":"ee9","fromID":"5","toID":"E5","formEdgeID":null,"text": "describes"}],
+ 
+ "locutions":[]}

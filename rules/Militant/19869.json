@@ -1,0 +1,34 @@
+{"nodes":[{"nodeID":"28","text":"Person X is a member of a charity","type":"I","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"29","text":"Person X flies regularly to a place Y","type":"I","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"30","text":"Person X has phone conversations with people in place Y","type":"I","timestamp":"2021-01-25 13:27:05"},
+          
+          {"nodeID":"31","text":"Person X is not a militant","type":"I","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"32","text":"Person X is not taking a known militant route","type":"I","timestamp":"2021-01-25 13:27:05"},
+          
+          
+          {"nodeID":"37","text":"Default Inference","type":"RA","timestamp":"2021-01-26 09:23:34","scheme":"Default Inference","schemeID":"72"},
+          {"nodeID":"38","text":"Default Inference","type":"RA","timestamp":"2021-01-26 09:23:34","scheme":"Default Inference","schemeID":"72"}, 
+          {"nodeID":"39","text":"Default Inference","type":"RA","timestamp":"2021-01-26 09:23:34","scheme":"Default Inference","schemeID":"72"},
+          {"nodeID":"40","text":"Default Inference","type":"RA","timestamp":"2021-01-26 09:23:34","scheme":"Default Inference","schemeID":"72"} 
+         
+         ],
+
+ "edges":[{"edgeID":"ee44","fromID":"28","toID":"37","formEdgeID":null},
+          {"edgeID":"ee46","fromID":"37","toID":"31","formEdgeID":null},
+          
+          {"edgeID":"ee47","fromID":"28","toID":"38","formEdgeID":null}, 
+          {"edgeID":"ee48","fromID":"29","toID":"38","formEdgeID":null},
+          {"edgeID":"ee50","fromID":"38","toID":"32","formEdgeID":null},
+          
+          {"edgeID":"ee51","fromID":"28","toID":"39","formEdgeID":null}, 
+          {"edgeID":"ee52","fromID":"29","toID":"39","formEdgeID":null}, 
+          {"edgeID":"ee53","fromID":"30","toID":"39","formEdgeID":null},
+          {"edgeID":"ee55","fromID":"39","toID":"31","formEdgeID":null},
+          
+          {"edgeID":"ee56","fromID":"30","toID":"40","formEdgeID":null}, 
+          {"edgeID":"ee58","fromID":"40","toID":"32","formEdgeID":null}
+          
+          
+         ],
+ 
+ "locutions":[]}

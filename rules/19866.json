@@ -1,0 +1,13 @@
+{"nodes":[{"nodeID":"7","text":"Person X has issues with his/her colleagues","type":"I","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"8","text":"Person X stays longer in his/her office","type":"I","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"9","text":"Person X's managers are informed that he had a job interview at a competitor company","type":"I","timestamp":"2021-01-25 13:27:05"}, 
+          {"nodeID":"5","text":"Person X is committing corporate espionage","type":"I","timestamp":"2021-01-25 13:27:05"},
+         
+          {"nodeID":"11","text":"Default Inference","type":"RA","timestamp":"2021-01-26 09:23:34","scheme":"Default Inference","schemeID":"72"}],
+
+ "edges":[{"edgeID":"ee10","fromID":"7","toID":"11","formEdgeID":null},
+          {"edgeID":"ee11","fromID":"8","toID":"11","formEdgeID":null},
+          {"edgeID":"ee12","fromID":"9","toID":"11","formEdgeID":null},
+          {"edgeID":"ee14","fromID":"11","toID":"5","formEdgeID":null}],
+ 
+ "locutions":[]}

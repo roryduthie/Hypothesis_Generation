@@ -1,21 +1,21 @@
 {"nodes":[{"nodeID":"17","text":"Person X has visited a foreign fighter location","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
           {"nodeID":"18","text":"Person X is on police watchlist","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
-          {"nodeID":"19","text":"Person X flies to an FF place from an FF point","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"19","text":"Person X flies to a foreigh fighter place from a foreign fighter point","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
           
-          {"nodeID":"20","text":"Person X is a foreign fighter","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
-          {"nodeID":"21","text":"Person X is taking a known foreign fighter route","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"20","text":"Person X is a militant","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"21","text":"Person X is taking a known militant route","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
     
           
           {"nodeID": "E17", "type": "Event", "name": "visit", "circa": "", "inSpace": "FF location", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""},
           {"nodeID": "E18", "type": "Event", "name": "police watchlist", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""},
-          {"nodeID": "E19", "type": "Event", "name": "flying", "circa": "", "inSpace": "FF point", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "FF place", "illustrate": ""}, 
+          {"nodeID": "E19", "type": "Event", "name": "flying", "circa": "", "inSpace": "foreign fighter point", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "foreign fighter place", "illustrate": ""}, 
           {"nodeID": "E20", "type": "Event", "name": "being foreign fighter", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""}, 
-          {"nodeID": "E21", "type": "Event", "name": "foreign fighter route", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""}, 
+          {"nodeID": "E21", "type": "Event", "name": "foreign fighter route", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""}
          ],
 
  "edges":[{"edgeID":"ee39","fromID":"17","toID":"E17","formEdgeID":null,"text": "describes"},
           {"edgeID":"ee40","fromID":"18","toID":"E18","formEdgeID":null,"text": "describes"},{"edgeID":"ee41","fromID":"19","toID":"E19","formEdgeID":null,"text": "describes"},
           {"edgeID":"ee42","fromID":"20","toID":"E20","formEdgeID":null,"text": "describes"},
-          {"edgeID":"ee43","fromID":"21","toID":"E21","formEdgeID":null,"text": "describes"}]
+          {"edgeID":"ee43","fromID":"21","toID":"E21","formEdgeID":null,"text": "describes"}],
  
  "locutions":[]}

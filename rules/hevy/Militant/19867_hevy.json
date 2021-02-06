@@ -1,0 +1,13 @@
+{"nodes":[{"nodeID":"12","text":"Person X has connections to a militant entity","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"13","text":"Person X has access to weapons","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+          {"nodeID":"15","text":"Person X is a militant","type":"EventDescription","timestamp":"2021-01-25 13:27:05"},
+    
+          {"nodeID": "E12", "type": "Event", "name": "connections to entity", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""},
+          {"nodeID": "E13", "type": "Event", "name": "access to stuff", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""},
+          {"nodeID": "E15", "type": "Event", "name": "being a militant", "circa": "", "inSpace": "", "involvedAgent": "", "involved": "", "atTime": "", "atPlace": "", "illustrate": ""}
+         ],
+
+ "edges":[{"edgeID":"ee23","fromID":"12","toID":"E12","formEdgeID":null,"text": "describes"},
+          {"edgeID":"ee24","fromID":"13","toID":"E13","formEdgeID":null,"text": "describes"},{"edgeID":"ee25","fromID":"15","toID":"E15","formEdgeID":null,"text": "describes"}]
+ 
+ "locutions":[]}
