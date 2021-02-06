@@ -1035,7 +1035,7 @@ if __name__ == "__main__":
         hevy_rules_path = 'rules/hevy/'
     else:
         rules_path = 'rules/' + context + '/'
-        hevy_rules_path = 'rules/hevy/' + conext + '/'
+        hevy_rules_path = 'rules/hevy/' + context + '/'
     
     rules, full_scheme_data = get_rules_data(rules_path, hevy_rules_path)
     nlp = spacy.load("en_core_web_sm")
